@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	xsi:schemaLocation="
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/tx
+    http://www.springframework.org/schema/tx/spring-tx.xsd
+    http://www.springframework.org/schema/jdbc
+    http://www.springframework.org/schema/jdbc/spring-jdbc-3.1.xsd
+    http://www.springframework.org/schema/cache
+    http://www.springframework.org/schema/cache/spring-cache-3.1.xsd
+    http://www.springframework.org/schema/aop
+    http://www.springframework.org/schema/aop/spring-aop.xsd
+    http://www.springframework.org/schema/util
+    http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<!-- 自动扫描web包 ,将带有注解的类 纳入spring容器管理 -->
+	<!-- <context:component-scan base-package="com.hong" /> -->
+
+	<bean id="human" class="com.hong.Human" />
+
+	<!-- 定义通知内容 -->
+	<bean id="sleepHelper" class="com.hong.SleepHelper" />
+
+	<!-- 配置切点 -->
+	<bean id="sleepPointcut" class="org.springframework.aop.support.JdkRegexpMethodPointcut">
+		<property name="pattern" value=".*sleep" />
+	</bean>
+
+	<!-- 把通知内容和切点结合起来，组成通知者 -->
+	<bean id="sleepHelperAdvisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">
+		<property name="advice" ref="sleepHelper" />
+		<property name="pointcut" ref="sleepPointcut" />
+	</bean>
+
+	<!-- 配置代理对象 -->
+	<bean id="humanProxy" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="target" ref="human" />
+		<property name="interceptorNames" value="sleepHelperAdvisor" />
+		<property name="proxyInterfaces" value="com.hong.Sleepable" />
+	</bean>
+
+	<!-- 配置使Spring采用CGLIB代理 -->
+	<!-- <aop:aspectj-autoproxy proxy-target-class="true" /> -->
+</beans>
