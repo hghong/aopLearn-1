@@ -21,26 +21,23 @@
     http://www.springframework.org/schema/util
     http://www.springframework.org/schema/util/spring-util.xsd">
 
+
+	<!-- 
+		此配置文件为 applicationCOntext.xml 实现 aop 的简化版，
+		通过 DefaultAdvisorAutoProxyCreator自动创建代理对象	
+	 -->
+
+
 	<bean id="human" class="com.hong.Human" />
 
 	<!-- 定义通知内容 -->
 	<bean id="sleepHelper" class="com.hong.SleepHelper" />
 
-	<!-- 配置切点 -->
-	<bean id="sleepPointcut" class="org.springframework.aop.support.JdkRegexpMethodPointcut">
+	<!-- 直接配置通知者 -->
+	<bean id="sleepAdvisor"
+		class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
+		<property name="advice" ref="sleepHelper" />
 		<property name="pattern" value=".*sleep" />
 	</bean>
-
-	<!-- 把通知内容和切点结合起来，组成通知者 -->
-	<bean id="sleepHelperAdvisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">
-		<property name="advice" ref="sleepHelper" />
-		<property name="pointcut" ref="sleepPointcut" />
-	</bean>
-
-	<!-- 配置代理对象 -->
-	<bean id="humanProxy" class="org.springframework.aop.framework.ProxyFactoryBean">
-		<property name="target" ref="human" />
-		<property name="interceptorNames" value="sleepHelperAdvisor" />
-		<property name="proxyInterfaces" value="com.hong.Sleepable" />
-	</bean>
+	<bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" />
 </beans>
