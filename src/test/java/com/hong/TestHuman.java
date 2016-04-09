@@ -14,7 +14,7 @@ public class TestHuman {
 	private Sleepable human;
 	
 	@Test
-	public void testSleep() {
+	public void testSleep()  {
 		human.sleep();
 	}
 }
